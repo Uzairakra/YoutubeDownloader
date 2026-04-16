@@ -1,6 +1,6 @@
 import Select from "react-select";
 import { DlIco, MusicIco, PlayIco2, SparkIco, YTIco } from "../icons";
-import { FORMAT_OPTIONS } from "../data";
+
 import ZigZagText from "./ZigZagText";
 
 const FM = { fontFamily: "'Montserrat',sans-serif" };
@@ -21,6 +21,7 @@ export default function Hero({
   aErr,
   link,
 }) {
+
   const blue = "#2563eb";
   const mu = dark ? "#8899b0" : "#6b7a99";
   const tx = dark ? "#e4eaf5" : "#1a2035";
@@ -52,17 +53,19 @@ export default function Hero({
       overflow: "hidden",
       zIndex: 9999,
       boxShadow: "0 12px 40px rgba(0,0,0,.28)",
+
     }),
     menuList: (b) => ({ ...b, padding: "6px", maxHeight: "220px" }),
     option: (b, { isFocused, isSelected }) => ({
       ...b,
+
       background: isSelected
         ? blue
         : isFocused
-        ? dark
-          ? "#1e2d45"
-          : "#eef2ff"
-        : "transparent",
+          ? dark
+            ? "#1e2d45"
+            : "#eef2ff"
+          : "transparent",
       color: isSelected ? "#fff" : tx,
       borderRadius: "8px",
       cursor: "pointer",
@@ -76,6 +79,7 @@ export default function Hero({
     indicatorSeparator: () => ({ display: "none" }),
     dropdownIndicator: (b) => ({ ...b, color: blue }),
     valueContainer: (b) => ({ ...b, padding: "2px 14px" }),
+    input: (b) => ({ ...b, color: tx }),
   };
 
   return (
@@ -223,30 +227,18 @@ export default function Hero({
         format, and hit download — it's that simple.
       </p>
 
-      {/* Form */}
       <div
         className="form-row"
         style={{
           display: "flex",
           gap: 10,
-          maxWidth: 730,
+          maxWidth: 620,
           margin: "0 auto",
           alignItems: "flex-start",
           justifyContent: "center",
           flexWrap: "wrap",
         }}
       >
-        <div className="sel-w" style={{ width: 170, flexShrink: 0 }}>
-          <Select
-            options={FORMAT_OPTIONS}
-            value={fmt}
-            onChange={setFmt}
-            styles={selStyles}
-            isSearchable={false}
-            menuPlacement="auto"
-            menuPortalTarget={document.body}
-          />
-        </div>
 
         <div className="inp-w" style={{ flex: 1, minWidth: 200 }}>
           <input
@@ -384,9 +376,25 @@ export default function Hero({
             >
               {data.title}
             </p>
-            <p style={{ color: mu, fontSize: ".8rem", marginBottom: 14, ...FU }}>
-              Format: {fmt.label}
-            </p>
+
+            {/* Format selector inside result card */}
+            <div style={{ marginBottom: 14, maxWidth: 220 }}>
+              <Select
+                options={
+                  (data.available_qualities || []).map((q) => ({
+                    value: q,
+                    label: q === "mp3" ? "MP3 (Audio)" : `${q}p`,
+                  }))
+                }
+                value={fmt}
+                onChange={setFmt}
+                styles={selStyles}
+                isSearchable={true}
+                menuPlacement="auto"
+                menuPortalTarget={document.body}
+              />
+            </div>
+
             <a
               className={!busy ? "pulse" : ""}
               href={link()}
@@ -406,7 +414,7 @@ export default function Hero({
                 ...FM,
               }}
             >
-              <DlIco /> Download {fmt.label}
+              <DlIco /> Download {fmt ? fmt.label : ""}
             </a>
           </div>
         </div>
