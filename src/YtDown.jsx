@@ -11,13 +11,13 @@ import Features from "./components/Features";
 import Footer from "./components/Footer";
 
 /* Data & Utils */
-import { API, FORMAT_OPTIONS, isYT } from "./data";
+import { API, isYT } from "./data";
 
 export default function YtDown() {
   const [dark, setDark] = useState(true);
   const [menu, setMenu] = useState(false);
   const [url, setUrl] = useState("");
-  const [fmt, setFmt] = useState(FORMAT_OPTIONS[0]);
+  const [fmt, setFmt] = useState(null);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [data, setData] = useState(null);
@@ -48,6 +48,12 @@ export default function YtDown() {
       const d = await r.json();
       if (!d.status) throw new Error();
       setData(d);
+      // Build format options from API response and auto-select first
+      const quals = d.available_qualities || [];
+      const firstOpt = quals.length
+        ? { value: quals[0], label: quals[0] === "mp3" ? "MP3 (Audio)" : `${quals[0]}p` }
+        : null;
+      setFmt(firstOpt);
     } catch {
       setAErr("Could not fetch video info. Check the URL or try again.");
     } finally {
@@ -56,7 +62,7 @@ export default function YtDown() {
   };
 
   const link = () => {
-    if (!data) return "#";
+    if (!data || !fmt) return "#";
     return fmt.value === "mp3" ? data.audio : data.videos?.[fmt.value] || "#";
   };
 
